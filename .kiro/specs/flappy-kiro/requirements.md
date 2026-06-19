@@ -19,7 +19,7 @@ Flappy Kiro is a retro, hand-drawn style endless side-scrolling browser game bui
 - **Terminal_Velocity**: The maximum downward velocity of 12 pixels per frame that the Ghost cannot exceed
 - **High_Score**: The highest score achieved, persisted in browser localStorage
 - **Game_State**: The current mode of the game, one of: Menu, Playing, Paused, or Game_Over
-- **Hitbox**: The axis-aligned bounding box used for collision detection, reduced by a fairness margin from the visual sprite dimensions
+- **Hitbox**: The collision shape used for detection; for the Ghost this is a circle (center at sprite center, radius derived from half the sprite width minus a fairness margin), and for Pipes this is an axis-aligned bounding box (AABB) matching the pipe rectangular geometry
 - **Particle**: A small visual element emitted from the Ghost during flight, creating a trail effect
 - **Screen_Shake**: A brief oscillating offset applied to the Game_Canvas rendering position as collision feedback
 - **Score_Popup**: A temporary floating text indicator that appears when the player earns a point
@@ -27,6 +27,7 @@ Flappy Kiro is a retro, hand-drawn style endless side-scrolling browser game bui
 - **Invincibility_Frames**: A brief period after collision triggers during which no additional collisions are registered (used during the game-over transition)
 - **Base_Speed**: The initial horizontal scroll speed for Pipe_Pairs, set at 3 pixels per frame at 60 FPS
 - **Speed_Multiplier**: A scaling factor applied to Base_Speed that increases over time to create progressive difficulty
+- **Object_Pool**: A pre-allocated collection of reusable game objects (Pipes or Particles) that avoids repeated creation and garbage collection during gameplay
 
 ## Requirements
 
@@ -79,13 +80,14 @@ Flappy Kiro is a retro, hand-drawn style endless side-scrolling browser game bui
 
 #### Acceptance Criteria
 
-1. THE Game_Engine SHALL define the Ghost Hitbox as the sprite dimensions reduced by a 4-pixel margin on each side (top, bottom, left, right) for fairness
-2. WHEN the Ghost Hitbox overlaps any Pipe axis-aligned bounding box (including the cap regions), THE Game_Engine SHALL trigger a game-over event
-3. WHEN the bottom edge of the Ghost Hitbox moves below the top edge of the Score_Bar, THE Game_Engine SHALL trigger a game-over event
-4. WHEN the top edge of the Ghost Hitbox moves above y=0 of the Game_Canvas, THE Game_Engine SHALL trigger a game-over event
-5. THE Game_Engine SHALL evaluate collision checks once per frame after updating positions and before rendering
-6. WHEN a game-over event is triggered, THE Game_Engine SHALL enter Invincibility_Frames for 300 milliseconds during which no additional collision checks are processed (preventing duplicate triggers during the game-over transition animation)
-7. WHEN a collision is detected with a Pipe, THE Game_Engine SHALL apply a Screen_Shake effect to the rendering offset for 300 milliseconds with a maximum displacement of 5 pixels in both axes using a decaying sinusoidal pattern
+1. THE Game_Engine SHALL define the Ghost Hitbox as a circle centered at the Ghost sprite center (x + width/2, y + height/2) with a radius equal to half the sprite width minus a 4-pixel fairness margin (radius = width/2 - 4)
+2. WHEN the Ghost circular Hitbox intersects any Pipe rectangular bounding box (including the cap regions), THE Game_Engine SHALL trigger a game-over event, using a circle-versus-rectangle intersection test (finding the closest point on the rectangle to the circle center and checking if the distance is less than the circle radius)
+3. THE Game_Engine SHALL define each Pipe Hitbox as an axis-aligned bounding box (AABB) matching the pipe rectangular geometry including cap extensions
+4. WHEN the lowest point of the Ghost circular Hitbox (center y + radius) moves below the top edge of the Score_Bar, THE Game_Engine SHALL trigger a game-over event
+5. WHEN the highest point of the Ghost circular Hitbox (center y - radius) moves above y=0 of the Game_Canvas, THE Game_Engine SHALL trigger a game-over event
+6. THE Game_Engine SHALL evaluate collision checks once per frame after updating positions and before rendering
+7. WHEN a game-over event is triggered, THE Game_Engine SHALL enter Invincibility_Frames for 300 milliseconds during which no additional collision checks are processed (preventing duplicate triggers during the game-over transition animation)
+8. WHEN a collision is detected with a Pipe, THE Game_Engine SHALL apply a Screen_Shake effect to the rendering offset for 300 milliseconds with a maximum displacement of 5 pixels in both axes using a decaying sinusoidal pattern
 
 ### Requirement 5: Scoring
 
@@ -189,4 +191,17 @@ Flappy Kiro is a retro, hand-drawn style endless side-scrolling browser game bui
 2. THE Game_Engine SHALL cap the Speed_Multiplier at a maximum value of 2.0, preventing the effective speed from exceeding 6 pixels per frame (Base_Speed of 3 multiplied by maximum Speed_Multiplier of 2.0)
 3. WHEN the Game_State transitions from Game_Over to Playing (restart), THE Game_Engine SHALL reset the Speed_Multiplier to 1.0
 4. WHILE the Speed_Multiplier increases, THE Game_Engine SHALL maintain the same horizontal spacing of 280 pixels between Pipe_Pairs (spacing is measured in pixels, not time, so faster speed means pipes appear more frequently in real time)
+
+### Requirement 13: Performance Optimization
+
+**User Story:** As a player, I want the game to run smoothly at a consistent frame rate without stutters or memory buildup, so that gameplay remains responsive and enjoyable during extended sessions.
+
+#### Acceptance Criteria
+
+1. THE Game_Engine SHALL target a consistent 60 frames per second rendering rate throughout gameplay
+2. THE Game_Engine SHALL use object pooling for Pipe instances, reusing deactivated Pipe objects from a pool instead of creating new objects and destroying old ones when Pipe_Pairs scroll off-screen
+3. THE Game_Engine SHALL use object pooling for Particle instances, reusing expired Particle objects from a pool instead of creating new objects and destroying old ones when Particles complete their lifetime
+4. THE Game_Engine SHALL batch similar rendering operations together (grouping pipe draws, particle draws, and cloud draws) to minimize Canvas 2D context state changes per frame
+5. WHILE the Game_State is Playing, THE Game_Engine SHALL avoid allocating new objects in the per-frame update and render paths, instead reusing pre-allocated objects from pools
+6. IF the measured frame time exceeds 20 milliseconds (below 50 FPS) for more than 10 consecutive frames, THEN THE Game_Engine SHALL log a performance warning to the browser console
 
