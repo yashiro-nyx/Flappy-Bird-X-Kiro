@@ -1,0 +1,48 @@
+{
+  "physics": {
+    "gravity": 800,
+    "gravityUnit": "px/s²",
+    "jumpVelocity": -300,
+    "jumpVelocityUnit": "px/s",
+    "terminalVelocity": 720,
+    "terminalVelocityUnit": "px/s"
+  },
+  "obstacles": {
+    "wallSpeed": 120,
+    "wallSpeedUnit": "px/s",
+    "gapSize": 140,
+    "gapSizeUnit": "px",
+    "wallSpacing": 350,
+    "wallSpacingUnit": "px",
+    "wallWidth": 60,
+    "wallWidthUnit": "px",
+    "capWidth": 68,
+    "capWidthUnit": "px",
+    "capHeight": 15,
+    "capHeightUnit": "px"
+  },
+  "difficulty": {
+    "speedIncrementPerPoint": 0.02,
+    "maxSpeedMultiplier": 2.0,
+    "startingMultiplier": 1.0
+  },
+  "canvas": {
+    "internalWidth": 900,
+    "internalHeight": 600,
+    "aspectRatio": "3:2",
+    "minDisplayWidth": 300,
+    "minDisplayHeight": 200
+  },
+  "scoring": {
+    "highScoreStorageKey": "flappyKiroHighScore"
+  },
+  "timing": {
+    "targetFPS": 60,
+    "gameOverInputLockout": 500,
+    "gameOverInputLockoutUnit": "ms",
+    "invincibilityDuration": 300,
+    "invincibilityDurationUnit": "ms",
+    "screenShakeDuration": 300,
+    "screenShakeDurationUnit": "ms"
+  }
+}
