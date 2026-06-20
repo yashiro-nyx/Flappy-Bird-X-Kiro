@@ -1,10 +1,10 @@
-# 🐦 Flappy Bird Kiro
+# 👻 Flappy Bird X Kiro
 
 A modern recreation of the classic **Flappy Bird** game built with **HTML, CSS, and JavaScript** using **Kiro IDE**. This project demonstrates game development fundamentals such as collision detection, physics, scoring, animations, and responsive user interaction.
 
 ## 🎮 Features
 
-* Smooth Flappy Bird gameplay
+* Smooth Flappy Kiro gameplay
 * Gravity-based bird movement
 * Randomly generated obstacle pipes
 * Collision detection
@@ -25,7 +25,7 @@ A modern recreation of the classic **Flappy Bird** game built with **HTML, CSS, 
 ## 📂 Project Structure
 
 ```
-Flappy-Bird-Kiro/
+Flappy-Bird-X-Kiro/
 ├── assets/              # Images, audio, and game assets
 ├── src/                 # JavaScript source files
 ├── index.html
@@ -49,13 +49,13 @@ Flappy-Bird-Kiro/
 Clone the repository:
 
 ```bash
-git clone https://github.com/yashiro-nyx/Flappy-Bird-Kiro.git
+git clone https://github.com/yashiro-nyx/Flappy-Bird-X-Kiro.git
 ```
 
 Navigate into the project:
 
 ```bash
-cd Flappy-Bird-Kiro
+cd Flappy-Bird-X-Kiro
 ```
 
 Install dependencies:
